@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoreo de prensa · Caso Alicia Graham · FSFB · 12–21 nov 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1F1733; --ink-2:#4A4260; --ink-3:#7A7390;
+  --surface:#FFFFFF; --page:#F6F3EE; --line:#E6E1EA;
+  --brand:#2B1F45; --brand-2:#3A2A66; --accent:#F4B323;
+  --s-alta:#3A2A66; --s-media:#7461A8; --s-baja:#B9ADD9; --s-ninguna:#DCD8E3;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--page);color:var(--ink);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}
+a{color:var(--brand-2)}
+header.top{background:var(--brand);color:#FAF6EE;padding:28px 20px 0}
+.wrap{max-width:1120px;margin:0 auto}
+.eyebrow{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);font-weight:700;margin:0 0 8px}
+h1{font-family:'Oswald','DM Sans',sans-serif;font-weight:600;font-size:clamp(26px,5vw,40px);line-height:1.1;margin:0 0 8px}
+.sub{color:#D8D1E8;margin:0 0 20px;font-size:14px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:0 0 auto;background:transparent;border:0;color:#D8D1E8;font:600 14px 'DM Sans',sans-serif;padding:12px 16px;border-radius:10px 10px 0 0;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--page);color:var(--brand)}
+main{padding:20px}
+section.panel{display:none}
+section.panel.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card h2{font-size:17px;margin:0 0 4px;font-weight:700}
+.card .hint{color:var(--ink-3);font-size:13px;margin:0 0 16px}
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.kpi .lbl{font-size:13px;color:var(--ink-2);margin:0 0 6px}
+.kpi .val{font-size:32px;font-weight:700;line-height:1;margin:0}
+.kpi .det{font-size:12px;color:var(--ink-3);margin:6px 0 0}
+.kpi.hero{background:var(--brand);border-color:var(--brand);color:#FAF6EE}
+.kpi.hero .lbl,.kpi.hero .det{color:#D8D1E8}
+.kpi.hero .val{font-size:48px;color:#fff}
+.kpi.hero .val small{font-size:20px;color:var(--accent);font-weight:600}
+@media(max-width:820px){.kpis{grid-template-columns:repeat(3,1fr)}.kpi.hero{grid-column:span 3}}
+@media(max-width:520px){.kpi{padding:12px}.kpi .lbl{font-size:12px;line-height:1.3}.kpi .val{font-size:26px}.kpi .det{font-size:11px}.kpi.hero .val{font-size:44px}}
+/* segmented bars */
+.seg-title{font-size:14px;font-weight:600;margin:0 0 8px}
+.seg{display:flex;gap:2px;height:28px;margin-bottom:10px}
+.seg div{border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:13px;font-weight:600;white-space:nowrap;overflow:visible;cursor:default;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink-2);margin-bottom:22px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.two{grid-template-columns:1fr}}
+/* columns chart */
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:#fff;font-size:12.5px;line-height:1.45;padding:8px 10px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.18);opacity:0;transition:opacity .1s;z-index:50;max-width:240px}
+.tip b{font-weight:700}
+.tip .row{display:flex;align-items:center;gap:6px}
+.tip i{width:8px;height:8px;border-radius:2px;display:inline-block}
+details.data{margin-top:10px;font-size:13px;color:var(--ink-2)}
+details.data summary{cursor:pointer;color:var(--brand-2);font-weight:600}
+details.data table{border-collapse:collapse;margin-top:8px;font-variant-numeric:tabular-nums}
+details.data th,details.data td{padding:4px 10px;border-bottom:1px solid var(--line);text-align:right}
+details.data th:first-child,details.data td:first-child{text-align:left}
+/* posture box */
+.posture{border-left:4px solid var(--accent);background:#FFF9EA;border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;font-size:14px;color:var(--ink-2)}
+.posture b{color:var(--ink)}
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:600 13px 'DM Sans',sans-serif;padding:7px 12px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+select,input[type=search]{font:500 13px 'DM Sans',sans-serif;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);color:var(--ink)}
+input[type=search]{flex:1 1 180px;min-width:0}
+.count{font-size:13px;color:var(--ink-3);margin:0 0 8px}
+/* table with internal scroll */
+.scroller{max-height:68vh;overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table.notes{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;font-size:13.5px}
+table.notes thead th{position:sticky;top:0;background:#F1EDF6;color:var(--ink);text-align:left;font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line);z-index:2;white-space:nowrap}
+table.notes td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+table.notes td.t a{color:var(--ink);font-weight:600;text-decoration:none}
+table.notes td.t a:hover{text-decoration:underline}
+table.notes td.d{white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap}
+.pill i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.aprox{font-size:11px;color:var(--ink-3)}
+/* mobile cards inside the same scroller */
+@media(max-width:700px){
+  table.notes{min-width:0}
+  table.notes thead{display:none}
+  table.notes,table.notes tbody,table.notes tr,table.notes td{display:block;width:100%}
+  table.notes tr{padding:14px 14px 10px;border-bottom:1px solid var(--line)}
+  table.notes td{border:0;padding:3px 0}
+  table.notes td[data-l]:before{content:attr(data-l);display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-3);font-weight:700;margin-top:6px}
+  table.notes td.d,table.notes td.m{display:inline;width:auto}
+  table.notes td.m:before{content:" · ";color:var(--ink-3)}
+  table.notes td.t{margin-top:4px}
+  table.notes td.tags{display:flex;gap:6px 8px;flex-wrap:wrap;align-items:center;margin:6px 0 2px}
+  table.notes td.hide-m{display:none}
+}
+/* findings */
+ol.findings{list-style:none;padding:0;margin:0;counter-reset:f}
+ol.findings li{counter-increment:f;position:relative;padding:18px 18px 18px 64px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px}
+ol.findings li:before{content:counter(f,decimal-leading-zero);position:absolute;left:18px;top:16px;font-family:'Oswald',sans-serif;font-size:26px;font-weight:600;color:var(--accent);line-height:1}
+ol.findings h3{font-size:16px;margin:0 0 6px}
+ol.findings p{margin:0;color:var(--ink-2)}
+.method{font-size:13px;color:var(--ink-2)}
+.method dt{font-weight:700;color:var(--ink);margin-top:8px}
+.method dd{margin:2px 0 0 0}
+footer{padding:20px;color:var(--ink-3);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Monitoreo de prensa · Fundación Santa Fe de Bogotá</p>
+    <h1>Caso Alicia Graham: presencia de la FSFB en medios</h1>
+    <p class="sub">12 al 21 de noviembre de 2026 · 45 notas leídas completas · Preparado por CROP Asuntos Públicos</p>
+    <nav class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="resumen">Resumen</button>
+      <button role="tab" aria-selected="false" data-tab="notas">Notas</button>
+      <button role="tab" aria-selected="false" data-tab="hallazgos">Hallazgos</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- RESUMEN -->
+  <section class="panel active" id="resumen">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="two">
+      <div class="card">
+        <h2>¿Cómo aparece la FSFB?</h2>
+        <p class="hint">Tipo de mención en las 45 notas</p>
+        <div id="segMencion"></div>
+      </div>
+      <div class="card">
+        <h2>¿Qué tan expuesta queda?</h2>
+        <p class="hint">Nivel de exposición para la FSFB en las 45 notas</p>
+        <div id="segExpo"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Notas por día, según exposición para la FSFB</h2>
+      <p class="hint">El 18 de noviembre la cobertura cambia de tono: aparecen las notas de exposición alta</p>
+      <div class="chart" id="daily"></div>
+      <div class="legend" id="dailyLegend" style="margin:12px 0 0"></div>
+      <details class="data"><summary>Ver tabla de datos</summary><div id="dailyTable"></div></details>
+    </div>
+
+    <div class="posture">
+      <b>Versión de la FSFB en prensa.</b> La única que circula es la respuesta a un derecho de petición de la familia, citada por Semana y Pulzo el 21 de noviembre: el resultado sí estaba archivado con la historia clínica y no se incluyó en la copia entregada por un error del área de archivos médicos. No se cita a ningún vocero de la Fundación.
+    </div>
+  </section>
+
+  <!-- NOTAS -->
+  <section class="panel" id="notas">
+    <div class="filters" id="fExpo"></div>
+    <div class="filters">
+      <select id="fMencion" aria-label="Filtrar por tipo de mención">
+        <option value="">Toda mención</option>
+        <option value="E">Explícita</option>
+        <option value="I">Indirecta</option>
+        <option value="N">No menciona</option>
+      </select>
+      <input type="search" id="fTexto" placeholder="Buscar medio, titular o fuente…" aria-label="Buscar">
+    </div>
+    <p class="count" id="count"></p>
+    <div class="scroller">
+      <table class="notes">
+        <thead><tr>
+          <th>Fecha</th><th>Medio</th><th style="min-width:280px">Titular</th><th>Mención</th><th>Exposición</th><th style="min-width:300px">Qué dice sobre la FSFB</th><th style="min-width:200px">Fuentes citadas</th><th>Tipo de medio</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="card method" style="margin-top:16px">
+      <h2>Cómo se clasificó</h2>
+      <dl>
+        <dt>Mención</dt>
+        <dd><b>Explícita:</b> nombra a la FSFB, a la Fundación Santa Fe o a la "Clínica Santa Fe". <b>Indirecta:</b> habla de "la clínica" o "una institución médica" sin nombrarla. <b>No menciona:</b> la FSFB no aparece.</dd>
+        <dt>Exposición</dt>
+        <dd><b>Alta:</b> le atribuye a la FSFB la pérdida u ocultamiento del resultado. <b>Media:</b> afirma que el resultado llegó a la FSFB y no está en la historia clínica, sin atribuir intención. <b>Baja:</b> mención de contexto (lugar de atención o documentos del expediente). <b>Ninguna:</b> sin mención.</dd>
+        <dt>Fechas</dt>
+        <dd>Las marcadas "aprox." se estimaron por la antigüedad de la publicación y pueden variar en un día.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- HALLAZGOS -->
+  <section class="panel" id="hallazgos">
+    <ol class="findings">
+      <li><h3>El foco de la cobertura es Juan de Bedout; la FSFB aparece por el examen de agosto de 2021</h3>
+        <p>La cobertura arranca el 12 de noviembre, cuando Los Informantes revela la denuncia de los hermanos Graham contra Juan de Bedout. La mayoría de titulares apunta a él y a los audios de Alicia Graham. La FSFB entra a la historia por un solo hecho: el resultado de Labintox que, según la familia, llegó a la Fundación el 14 de agosto de 2021 y no aparece en la copia de la historia clínica que recibieron.</p></li>
+      <li><h3>Más de la mitad de las notas nombra a la FSFB</h3>
+        <p>25 de las 45 notas (56%) nombran a la Fundación, y 3 más hablan de "la clínica" sin nombrarla. Varios medios la llaman "Clínica Santa Fe". En 15 notas la exposición es media: repiten el dato del resultado ausente de la historia clínica sin atribuir intención.</p></li>
+      <li><h3>El tono cambia el 18 de noviembre</h3>
+        <p>Del 12 al 17 de noviembre la FSFB aparece como el lugar donde fue atendida y murió Alicia Graham. El 18 de noviembre el apoderado de la familia, David Espinosa, da entrevistas a Blu Radio y La FM en las que dice que el resultado "se desapareció" en la institución. Esas entrevistas se replican en Pulzo, Radio Hoy y Diario del Cesar, y concentran 4 de las 6 notas de exposición alta. Las otras 2 son la publicación de Semana del 21 de noviembre y la réplica de Pulzo.</p></li>
+      <li><h3>Todo lo que se dice de la FSFB viene de una sola fuente</h3>
+        <p>Los señalamientos sobre la Fundación provienen del apoderado de la familia o de documentos aportados por ella. En lo publicado, ni la Fiscalía ni personal médico han hecho señalamientos contra la FSFB, y ninguna nota menciona acciones legales contra la institución.</p></li>
+      <li><h3>Aparecen dos preguntas que van más allá del archivo</h3>
+        <p>Semana plantea por qué no se actuó médicamente con el resultado días antes de la muerte. En Blu Radio, Espinosa afirma que la Fiscalía examina si el correo del laboratorio fue ocultado o ignorado intencionalmente en la institución; la Fiscalía no lo ha confirmado. Cambio, por su parte, reporta que según la denuncia De Bedout pidió reemplazar a la médica internista que ordenó las pruebas, y que sin necropsia el caso dependerá de los registros médicos.</p></li>
+      <li><h3>La versión de la FSFB casi no aparece</h3>
+        <p>Solo Semana y Pulzo (21 nov) recogen una explicación de la Fundación: el resultado estaba archivado y no se incluyó en la copia entregada por un error de archivos médicos. Esa versión no tiene vocero identificado. En las demás notas no figura la versión de la Fundación.</p></li>
+      <li><h3>Cobertura nacional con réplicas regionales e internacionales</h3>
+        <p>Los medios nacionales (Semana, El Tiempo, Noticias Caracol, Noticias RCN, Blu Radio, La FM, Publimetro, Pulzo, Cambio) generan el contenido, y lo replican medios regionales (El Colombiano, El Heraldo, Vanguardia, El País, Diario del Cesar, Chicanoticias). Fuera de Colombia, Infobae (edición Colombia) y Colombia One, en inglés, recogen el dato del examen enviado a la FSFB.</p></li>
+    </ol>
+  </section>
+</main>
+<footer>CROP Asuntos Públicos · Monitoreo de prensa para la Fundación Santa Fe de Bogotá · Corte: 21 de noviembre de 2026</footer>
+<div class="tip" id="tip"></div>
+
+<script>
+const DATA = [
+{d:"2026-11-21",m:"Semana",t:"Exclusivo: Alicia Graham, madre de una de las niñas asesinadas con talio, alertó que la “querían matar” y buscó un investigador",u:"https://www.semana.com/nacion/articulo/exclusivo-alicia-graham-madre-de-una-de-las-ninas-asesinadas-con-talio-alerto-que-la-querian-matar-y-busco-un-investigador/202653/",me:"E",ex:"A",q:"Nota de mayor exposición. Con base en informes que la familia entregó a la Fiscalía, afirma que el resultado positivo se “embolató” en la FSFB, no llegó a los médicos y se ocultó dentro de la institución. Pregunta por qué no se actuó médicamente días antes de la muerte. Cita la respuesta de la FSFB, sin vocero: error del área de archivos médicos al descargar la historia clínica.",f:"Informes de investigadores de la familia, David Espinosa, FSFB (respuesta escrita)",tp:"Nacional"},
+{d:"2026-11-21",ap:1,m:"Pulzo",t:"Destapan medida que tomó Alicia Graham al sospechar envenenamiento; habrían ocultado pruebas",u:"https://www.pulzo.com/nacion/alicia-graham-busco-investigador-privado-por-sospechas-envenenamiento-PP5360990",me:"E",ex:"A",q:"Retoma a Semana con un titular sobre pruebas ocultadas. Incluye la explicación de la FSFB sobre el error en la descarga y no da por confirmada su responsabilidad.",f:"Semana, hermanos Graham, David Espinosa, FSFB",tp:"Nacional digital"},
+{d:"2026-11-21",m:"Publimetro",t:"“Otra vez me están envenenando”: revelan la voz de Alicia Graham y la pista que sus hermanos quieren que investigue la Fiscalía",u:"https://www.publimetro.co/bogota/2026/11/21/otra-vez-me-estan-envenenando-revelan-la-voz-de-alicia-graham-y-la-pista-que-sus-hermanos-quieren-que-investigue-la-fiscalia-en-caso-de-ninas-muertas-por-talio/",me:"E",ex:"M",q:"Según los hermanos, el resultado de Labintox llegó a la FSFB el 14 ago 2021 y no estaba en la copia de la historia clínica. No incluye versión de la FSFB.",f:"Hermanos Graham, David Espinosa, Fabio Humar, El Tiempo",tp:"Nacional digital"},
+{d:"2026-11-21",m:"Infobae",t:"“Yo no creo que el cuerpo me aguante por una tercera envenenada”, dijo Alicia Graham; su familia pide investigar su muerte y a su esposo",u:"https://www.infobae.com/colombia/2026/11/21/yo-no-creo-que-el-cuerpo-me-aguante-por-una-tercera-envenenada-dijo-alicia-graham-su-familia-pide-investigar-su-muerte-y-a-su-esposo-juan-de-bedout/",me:"E",ex:"B",q:"Una sola mención: el material de los hermanos incluye exámenes hechos en la FSFB. No le atribuye irregularidades.",f:"David Espinosa, Fabio Humar, fiscal general Luz Adriana Camargo, El Tiempo",tp:"Internacional (ed. Colombia)"},
+{d:"2026-11-21",ap:1,m:"El Colombiano",t:"“No creo que el cuerpo me aguante una tercera envenenada”: esta es la voz de Alicia Graham pidiendo ayuda antes de morir",u:"https://www.elcolombiano.com/colombia/no-creo-que-el-cuerpo-me-aguante-una-tercera-envenenada-esta-es-la-voz-de-alicia-graham-pidiendo-ayuda-antes-de-morir-II43878550",me:"E",ex:"B",q:"Una sola mención: lo entregado a la Fiscalía incluye “reportes de la Fundación Santa Fe”. No le atribuye responsabilidad.",f:"David Espinosa, Fabio Humar, Luz Adriana Camargo, El Tiempo",tp:"Regional (Antioquia)"},
+{d:"2026-11-21",ap:1,m:"Pulzo",t:"Audio de Alicia Graham, mamá de niña muerta por talio, daría aterradora revelación: “Estoy asustada”",u:"https://www.pulzo.com/nacion/audio-alicia-graham-mama-nina-muerta-por-talio-daria-revelacion-caso-PP5361099",me:"N",ex:"N",q:"Audio de Alicia Graham. No menciona a la FSFB.",f:"Alicia Graham (audio), hermanos Graham",tp:"Nacional digital"},
+{d:"2026-11-21",m:"Radio Hoy (réplica de La FM)",t:"“No creo que el cuerpo me aguante para una tercera envenenada”: el audio de Alicia Graham que llegó a la Fiscalía",u:"https://www.radiohoy.com/2026/11/21/no-creo-que-el-cuerpo-me-aguante-para-una-tercera-envenenada-el-audio-de-alicia-graham-que-llego-a-la-fiscalia/835065/",me:"E",ex:"B",q:"Dice que la solicitud de los hermanos incluye reportes de la Fundación Santa Fe con los exámenes de julio de 2021. No le atribuye responsabilidad.",f:"David Espinosa, Fabio Humar, El Tiempo",tp:"Digital"},
+{d:"2026-11-21",m:"Nos Cogió la Noche",t:"Alicia Graham temió ser asesinada: reabren su muerte por posible talio",u:"https://noscogiolanoche.com/alicia-graham-temio-ser-asesinada-reabren-su-muerte-por-posible-talio/",me:"N",ex:"N",q:"Reapertura del caso por la Fiscalía. No menciona a la FSFB.",f:"Familiares, David Espinosa, Luz Adriana Camargo",tp:"Digital"},
+{d:"2026-11-21",ap:1,m:"Head Topics",t:"Audios de Alicia Graham Sardi revelan temor a un nuevo envenenamiento con talio",u:"https://co.headtopics.com/news/audios-de-alicia-graham-sardi-revelan-temor-a-un-nuevo-90059738",me:"E",ex:"B",q:"Resumen de El Colombiano: el expediente incluye reportes de la FSFB.",f:"El Tiempo, David Espinosa, hermanos Graham",tp:"Agregador"},
+{d:"2026-11-20",ap:1,m:"El Colombiano",t:"¿También fue envenenada? Examen toxicológico confirmó presencia de talio en Alicia Graham",u:"https://www.elcolombiano.com/colombia/examen-toxicologico-talio-alicia-graham-madre-ninas-envenenadas-FO43815176",me:"N",ex:"N",q:"Se centra en el examen revelado por La FM. No nombra a la FSFB.",f:"David Espinosa, La FM, médico consultado",tp:"Regional (Antioquia)"},
+{d:"2026-11-19",m:"La FM",t:"“Alicia Graham no murió por cáncer”: el documento del examen de laboratorio que probó talio en la madre de las niñas envenenadas",u:"https://www.lafm.com.co/actualidad/alicia-graham-talio-examen-laboratorio-2021-juan-de-bedout-caso-frambuesas-envenenadas-417658",me:"E",ex:"M",q:"Publica el documento del examen y dice que la FSFB lo ordenó 14 días antes de la muerte. Deja abierta la pregunta de por qué no estaba en la historia clínica. No incluye versión de la FSFB.",f:"Documento de Labintox, bacterióloga que hizo el examen, médico independiente, David Espinosa",tp:"Nacional (radio)"},
+{d:"2026-11-19",m:"Noticias RCN",t:"Alicia Graham, ¿otra víctima del talio?: Examen toxicológico daría un giro en la investigación por su muerte",u:"https://www.noticiasrcn.com/colombia/examenes-toxicologicos-determinaron-presencia-de-talio-en-cuerpo-de-alicia-graham-1083472",me:"N",ex:"N",q:"Dice que la historia clínica registraba el cáncer como causa de la muerte, sin nombrar a la FSFB.",f:"Informe de laboratorio, exámenes aportados por la familia, Fiscalía",tp:"Nacional (TV)"},
+{d:"2026-11-18",m:"El Heraldo",t:"“Tenemos claro que la muerte de Alicia Graham sí fue consecuencia de envenenamiento con talio”: abogado",u:"https://www.elheraldo.co/colombia/2026/11/18/tenemos-claro-que-la-muerte-de-alicia-graham-si-fue-consecuencia-de-envenenamiento-con-talio-abogado/",me:"E",ex:"M",q:"Habla de la “Clínica Santa Fe”: según Espinosa, la médica tratante pidió allí un examen que salió positivo y no se incluyó en la historia clínica. No incluye versión de la FSFB.",f:"David Espinosa (en Blu Radio)",tp:"Regional (Caribe)"},
+{d:"2026-11-18",m:"Blu Radio",t:"“Un envenenamiento gota a gota con talio”: muerte de Alicia Graham tras hallazgo de examen médico",u:"https://www.bluradio.com/judicial/un-envenenamiento-gota-a-gota-con-talio-muerte-de-alicia-graham-tras-hallazgo-de-examen-medico-pr30",me:"E",ex:"A",q:"Entrevista en Mañanas Blu. Según Espinosa, el resultado positivo nunca se anexó a la historia clínica de la “Clínica Santa Fe” y “se desapareció”; por eso se dictaminó muerte natural y la familia cremó el cuerpo. Afirma que la Fiscalía investiga si el correo del laboratorio fue ocultado o ignorado intencionalmente en la institución. No incluye versión de la FSFB.",f:"David Espinosa (Mañanas Blu)",tp:"Nacional (radio)"},
+{d:"2026-11-18",m:"Radio Hoy (réplica de La FM)",t:"Alicia Graham no murió de cáncer: abogado de la familia asegura que fue envenenada con talio y que la prueba “la desaparecieron” en la clínica",u:"https://www.radiohoy.com/2026/11/18/alicia-graham-no-murio-de-cancer-abogado-de-la-familia-asegura-que-fue-envenenada-con-talio-y-que-la-prueba-la-desaparecieron-en-la-clinica/834042/",me:"E",ex:"A",q:"Entrevista de La FM. Espinosa dice que los resultados se “desaparecieron y extraviaron” en la Clínica Santa Fe. No incluye versión de la FSFB.",f:"David Espinosa",tp:"Digital"},
+{d:"2026-11-18",ap:1,m:"Diario del Cesar (réplica de La FM)",t:"Alicia Graham no murió de cáncer: abogado de la familia asegura que fue envenenada con talio y que la prueba “la desaparecieron” en la clínica",u:"https://www.diariodelcesar.com/archivos/351876/alicia-graham-no-murio-de-cancer-abogado-de-la-familia-asegura-que-fue-envenenada-con-talio-y-que-la-prueba-la-desaparecieron-en-la-clinica/",me:"E",ex:"A",q:"Misma entrevista de La FM: el abogado afirma que en la clínica se perdió el resultado. No incluye versión de la FSFB.",f:"David Espinosa",tp:"Regional (Cesar)"},
+{d:"2026-11-18",ap:1,m:"Pulzo",t:"¿Muerte de Alicia Graham fue por envenenamiento? Documento clave se perdió sobre su fallecimiento",u:"https://www.pulzo.com/nacion/muerte-alicia-graham-fue-por-envenenamiento-documento-clave-perdio-PP5358308",me:"E",ex:"A",q:"Recoge la entrevista de Blu Radio: el resultado positivo se envió al correo de la Clínica Santa Fe, donde se tomaron las muestras, y no quedó en la historia clínica. No incluye versión de la FSFB.",f:"David Espinosa",tp:"Nacional digital"},
+{d:"2026-11-18",ap:1,m:"Pulzo",t:"“Sabía que la estaban envenenando”: defensa de cuñados de Juan De Bedout hablan sobre Alicia Graham",u:"https://www.pulzo.com/nacion/abogado-hermanos-graham-revela-pruebas-testimonios-contra-juan-bedout-PP5358025",me:"N",ex:"N",q:"Testimonios contra De Bedout. No menciona a la FSFB.",f:"David Espinosa, El Tiempo",tp:"Nacional digital"},
+{d:"2026-11-18",m:"Infobae",t:"Apoderado de los familiares de Alicia Graham confirmó que la empresaria sabía que la estaban envenenando",u:"https://www.infobae.com/colombia/2026/11/18/apoderado-de-los-familiares-de-alicia-graham-confirmo-que-la-empresaria-sabia-que-la-estaban-envenenando-lo-manifesto-a-sus-amigas-cercanas/",me:"E",ex:"M",q:"Atribuido al expediente: el resultado de 672,9 µg/L se envió a la FSFB tres días antes de la muerte. No incluye versión de la FSFB.",f:"David Espinosa, Fabio Humar",tp:"Internacional (ed. Colombia)"},
+{d:"2026-11-18",m:"El Tiempo",t:"‘Alicia Graham sabía que la estaban envenenando con talio’: habla el apoderado de los cuñados del banquero Juan De Bedout",u:"https://eltiempo.com/unidad-investigativa/alicia-graham-sabia-que-la-estaban-envenenando-con-talio-habla-el-apoderado-de-los-cunados-del-banquero-juan-de-bedout-3601834",me:"N",ex:"N",q:"Entrevista a Espinosa centrada en De Bedout. No menciona a la FSFB.",f:"David Espinosa",tp:"Nacional"},
+{d:"2026-11-18",m:"Vanguardia",t:"Alicia Graham sabía que la estaban envenenando: lo que reveló el abogado de su familia",u:"https://www.vanguardia.com/colombia/2026/11/18/alicia-graham-sabia-que-la-estaban-envenenando-lo-que-revelo-el-abogado-de-su-familia/",me:"N",ex:"N",q:"Sospechas de Alicia Graham y denuncia de la familia. No menciona a la FSFB.",f:"David Espinosa, Fabio Humar",tp:"Regional (Santander)"},
+{d:"2026-11-18",m:"El País (Cali)",t:"Abogado de los hermanos Graham revela pruebas que buscan esclarecer la muerte de Alicia Graham; Juan De Bedout estaría implicado",u:"https://www.elpais.com.co/judicial/abogado-de-los-hermanos-graham-revela-pruebas-que-buscan-esclarecer-la-muerte-de-alicia-graham-juan-de-bedout-estaria-implicado-1859.html",me:"N",ex:"N",q:"Investigación privada y testimonios contra De Bedout. No menciona a la FSFB.",f:"David Espinosa",tp:"Regional (Valle)"},
+{d:"2026-11-18",ap:1,m:"El Tiempo",t:"Chats de Juan de Bedout y médico de Alicia Graham tras primeros síntomas de intoxicación con talio en Bogotá",u:"https://www.eltiempo.com/bogota/chats-de-juan-de-bedout-y-medico-de-alicia-graham-tras-primeros-sintomas-de-intoxicacion-con-talio-en-bogota-el-problema-es-saber-donde-lo-ingirio-3601725",me:"N",ex:"N",q:"Chats de De Bedout con el médico Carlos Julio Portocarrero. No menciona a la FSFB.",f:"Agencia de Periodismo Investigativo, Carlos Julio Portocarrero, Fabio Humar",tp:"Nacional"},
+{d:"2026-11-17",m:"Publimetro",t:"Nuevo giro en el caso del talio: Fiscalía ya llamó a declarar a varias personas por la muerte de Alicia Graham",u:"https://www.publimetro.co/bogota/2026/11/17/nuevo-giro-en-el-caso-del-talio-fiscalia-ya-llamo-a-declarar-a-varias-personas-por-la-muerte-de-alicia-graham-esposa-de-juan-de-bedout/",me:"E",ex:"M",q:"Según la familia, el resultado llegó a la FSFB el 14 ago y no estaba en la copia de la historia clínica. No incluye versión de la FSFB.",f:"Familia Graham, David Espinosa, Fabio Humar, El Tiempo",tp:"Nacional digital"},
+{d:"2026-11-17",m:"Infobae",t:"Estas son las conversaciones, pruebas y testigos que tienen en problemas con la justicia a Juan de Bedout",u:"https://www.infobae.com/colombia/2026/11/17/estas-son-las-conversaciones-pruebas-y-testigos-que-tienen-en-problemas-con-la-justicia-a-juan-de-bedout-familia-de-su-exesposa-alicia-graham-lo-senala-de-su-muerte-con-talio/",me:"E",ex:"B",q:"Recuento clínico de la Agencia de Periodismo Investigativo: ingresó a la FSFB el 30 jul 2021; la muestra de sangre salió negativa y la de orina positiva, confirmada el 14 ago. No cuestiona la atención médica.",f:"Agencia de Periodismo Investigativo, Carlos Julio Portocarrero, Cristina Graham, Fabio Humar",tp:"Internacional (ed. Colombia)"},
+{d:"2026-11-17",m:"Colombia.com",t:"Creían que murió de cáncer: lo que la Fiscalía investiga ahora sobre la mamá de una niña del caso talio",u:"https://www.colombia.com/actualidad/nacionales/caso-talio-la-fiscalia-investiga-la-muerte-de-alicia-graham-612941",me:"N",ex:"N",q:"Citaciones de la Fiscalía desde el 13 de noviembre. No menciona a la FSFB.",f:"Fiscalía, Darcy Quinn (en X)",tp:"Digital"},
+{d:"2026-11-17",m:"La Kalle (Blu Radio)",t:"Destapan pruebas en caso Alicia Graham, madre de niña envenenada con talio; hizo petición",u:"https://lakalle.bluradio.com/noticias/judiciales/destapan-pruebas-en-caso-alicia-graham-madre-de-nina-envenenada-con-talio-hizo-peticion-rg10",me:"N",ex:"N",q:"La Fiscalía cita a testigos. No menciona a la FSFB.",f:"Fiscalía, fiscal Elsa Reyes, David Espinosa",tp:"Nacional digital"},
+{d:"2026-11-14",m:"La FM",t:"Alicia Graham y el caso talio: los audios que dejó antes de morir y sus sospechas de presunto envenenamiento",u:"https://www.lafm.com.co/sociedad/alicia-graham-caso-talio-audios-dejo-antes-morir-presunto-envennamiento-417249",me:"E",ex:"M",q:"Según los familiares, el examen se envió a la FSFB el 14 ago y no aparece en la historia clínica que recibieron. No incluye versión de la FSFB.",f:"Hermanos Graham, El Tiempo, Fabio Humar",tp:"Nacional (radio)"},
+{d:"2026-11-14",m:"Colombia One",t:"Colombia Probes Suspected Thallium Poisoning of Businessman’s Ex-Wife",u:"https://colombiaone.com/2026/11/14/colombia-probes-suspected-thallium-poisoning-businessmans-ex-wife/",me:"E",ex:"M",q:"Nota en inglés. Según la denuncia, Labintox envió el resultado a la FSFB el 14 ago, Alicia Graham murió allí el 17 y el dato no aparece en la historia clínica. No incluye versión de la FSFB.",f:"Caracol Radio, denuncia de la familia, Fabio Humar, Fiscalía",tp:"Internacional (inglés)"},
+{d:"2026-11-14",m:"Publimetro",t:"“Me están envenenando”: revelan audios de la esposa de Juan de Bedout sobre su intoxicación con talio",u:"https://www.publimetro.co/bogota/2026/11/14/me-estan-envenenando-revelan-audios-de-la-esposa-de-juan-de-bedout-sobre-su-intoxicacion-con-talio/",me:"N",ex:"N",q:"Audios revelados por El Tiempo. No menciona a la FSFB.",f:"El Tiempo, hermanos Graham, Fabio Humar",tp:"Nacional digital"},
+{d:"2026-11-14",ap:1,m:"Pulzo",t:"“Me están envenenando”: reveladoras grabaciones de esposa de Juan de Bedout antes de morir por talio",u:"https://www.pulzo.com/nacion/bogota/audios-alicia-graham-sobre-intoxicacion-con-talio-solicitud-investigar-PP5356009",me:"N",ex:"N",q:"Audios y petición de investigar a De Bedout. No menciona a la FSFB.",f:"El Tiempo, hermanos Graham, David Espinosa, Fabio Humar",tp:"Nacional digital"},
+{d:"2026-11-13",m:"El Tiempo",t:"Exclusivo: los audios que dejó Alicia Graham, esposa de Juan De Bedout, sobre su intoxicación con talio",u:"https://www.eltiempo.com/unidad-investigativa/exclusivo-los-audios-que-dejo-alicia-graham-esposa-de-juan-de-bedout-sobre-su-intoxicacion-con-talio-el-mismo-veneno-que-mato-a-su-hija-3600981",me:"I",ex:"B",q:"Habla de una “clínica” sin nombrarla: según una fuente anónima, un investigador privado no pudo visitar allí a Alicia Graham.",f:"Unidad Investigativa, hermanos Graham, David Espinosa, Fabio Humar, fuente anónima",tp:"Nacional"},
+{d:"2026-11-13",m:"Semana",t:"Se conoce audio de Alicia Graham, esposa de Juan de Bedout y quien fue envenenada con talio",u:"https://www.semana.com/nacion/articulo/se-conoce-audio-de-alicia-graham-esposa-de-juan-de-bedout-y-quien-fue-envenenada-con-talio-lo-que-dice-podria-dar-giro-al-caso/202614/",me:"N",ex:"N",q:"Audio y la hipótesis de los hermanos sobre De Bedout. No menciona a la FSFB.",f:"El Tiempo, hermanos Graham",tp:"Nacional"},
+{d:"2026-11-13",m:"La Kalle (Blu Radio)",t:"Sale a la luz duro audio de Alicia Graham, mamá de una de las niñas envenenadas con talio",u:"https://lakalle.bluradio.com/noticias/judiciales/sale-a-la-luz-duro-audio-de-alicia-graham-mama-de-una-de-las-ninas-envenenadas-con-talio-rg10",me:"N",ex:"N",q:"Audio del 29 de julio de 2021. No menciona a la FSFB.",f:"El Tiempo, hermanos Graham, Fabio Humar, fiscal Elsa Reyes",tp:"Nacional digital"},
+{d:"2026-11-13",m:"El Tiempo",t:"Giro en caso de investigación por envenenamiento con talio: aparecen explosivos audios de Alicia Graham",u:"https://www.eltiempo.com/unidad-investigativa/giro-en-caso-de-investigacion-por-envenenamiento-con-talio-aparecen-explosivos-audios-de-alicia-graham-madre-de-una-de-las-ninas-muertas-3600653",me:"N",ex:"N",q:"Primeros audios y respuesta del abogado de De Bedout. No menciona a la FSFB.",f:"Fiscalía, María Elvira Arango, hermanos Graham, David Espinosa, Fabio Humar",tp:"Nacional"},
+{d:"2026-11-13",m:"Publimetro",t:"Giro en el caso del talio: Las pruebas que llevaron a denunciar a Juan de Bedout por la muerte de su esposa",u:"https://www.publimetro.co/bogota/2026/11/13/giro-en-el-caso-del-talio-las-pruebas-que-llevaron-a-denunciar-a-juan-de-bedout-por-la-muerte-de-su-esposa/",me:"E",ex:"M",q:"Retoma a Los Informantes: Alicia Graham fue atendida en la FSFB y el resultado se envió allí el 14 ago, pero no estaba en la historia clínica. No incluye versión de la FSFB.",f:"Fiscalía, Los Informantes, hermanos Graham, David Espinosa, Fabio Humar",tp:"Nacional digital"},
+{d:"2026-11-13",m:"Infobae",t:"Abogado de Juan de Bedout rechazó las acusaciones por el presunto envenenamiento con talio de su esposa Alicia Graham",u:"https://www.infobae.com/colombia/2026/11/13/abogado-de-juan-de-bedout-rechazo-las-acusaciones-por-el-presunto-envenenamiento-con-talio-de-su-esposa-alicia-graham/",me:"E",ex:"M",q:"Murió en la FSFB, donde su muerte se atribuyó al cáncer y no se investigó como violenta. Según la familia, el resultado de 672,9 µg/L llegó allí y no está en la historia clínica. No incluye versión de la FSFB.",f:"David Espinosa, Fabio Humar (en Caracol Radio)",tp:"Internacional (ed. Colombia)"},
+{d:"2026-11-13",m:"Focus Noticias",t:"“Entregaremos toda la información que la Fiscalía requiera”: la respuesta del abogado de Juan de Bedout",u:"https://focusnoticias.com/entregaremos-toda-la-informacion-que-la-fiscalia-requiera-la-respuesta-del-abogado-juan-de-bedout-a-la-denuncia-por-la-muerte-de-su-esposa-alicia-graham/",me:"E",ex:"M",q:"Hospitalizada en la FSFB desde el 30 jul y fallecida allí; según los hermanos, el resultado llegó tres días antes y falta en la historia clínica. No incluye versión de la FSFB.",f:"Fabio Humar, hermanos Graham, David Espinosa",tp:"Digital"},
+{d:"2026-11-13",m:"Chicanoticias",t:"Abogado de Juan de Bedout respondió a las acusaciones por el presunto envenenamiento con talio de Alicia Graham",u:"https://www.chicanoticias.com/2026/11/13/abogado-de-juan-de-bedout/",me:"E",ex:"M",q:"Según la familia, el examen con 672,9 µg/L se envió a la FSFB pero no aparece en la copia de la historia clínica. No incluye versión de la FSFB.",f:"Fabio Humar (en Caracol Radio), David Espinosa",tp:"Regional (Córdoba)"},
+{d:"2026-11-13",ap:1,m:"Pulzo",t:"Juan De Bedout respondió por medio de su abogado tras grave denuncia por muerte de su esposa",u:"https://www.pulzo.com/nacion/juan-bedout-abogado-respondio-denuncia-por-presunto-envenenamiento-PP5355282",me:"I",ex:"B",q:"Habla de una “institución médica” que habría recibido el examen, sin nombrarla.",f:"Fabio Humar, familiares de Graham",tp:"Nacional digital"},
+{d:"2026-11-12",m:"Noticias Caracol",t:"Caso talio: Juan de Bedout es denunciado por presunta relación con muerte de su exesposa",u:"https://www.noticiascaracol.com/colombia/bogota/giro-en-el-caso-talio-juan-de-bedout-es-denunciado-por-presunta-relacion-con-muerte-de-su-exesposa-rg10",me:"E",ex:"M",q:"Según Espinosa, Alicia Graham murió en la FSFB a causa del envenenamiento, aunque la muerte se presentó como natural por cáncer. No incluye versión de la FSFB.",f:"David Espinosa, denuncia, Labintox, Los Informantes",tp:"Nacional (TV)"},
+{d:"2026-11-12",m:"Cambio",t:"Padre de una de las niñas que habrían sido envenenadas por Zulma Guzmán es denunciado por la muerte de su exesposa en el 2021",u:"https://cambiocolombia.com/justicia/articulo/2026/11/padre-de-una-de-las-ninas-que-habrian-sido-envenenadas-por-zulma-guzman-es-denunciado-por-la-muerte-de-su-exesposa-en-2021",me:"I",ex:"M",q:"Habla de “la clínica” sin nombrarla: el resultado se envió allí el 14 ago y no está en la historia clínica. Según la denuncia, De Bedout pidió reemplazar a la médica internista que ordenó las pruebas toxicológicas. Señala que, sin necropsia, el caso dependerá de los registros médicos. No incluye versión de la FSFB.",f:"Fuentes de la Fiscalía, Fabio Humar (a El Espectador), Los Informantes, texto de la denuncia",tp:"Nacional digital"},
+{d:"2026-11-12",m:"Focus Noticias",t:"La familia de Alicia Graham denuncia a Juan de Bedout y pide investigar un examen de talio practicado antes de su muerte",u:"https://focusnoticias.com/la-familia-de-alicia-graham-denuncia-a-juan-de-bedout-y-pide-investigar-un-examen-de-talio-practicado-antes-de-su-muerte/",me:"E",ex:"M",q:"Murió en la FSFB. Según los hermanos, el informe de talio enviado allí el 14 ago no aparece en la historia clínica. No incluye versión de la FSFB.",f:"David Espinosa, hermanos Graham, Fabio Humar",tp:"Digital"},
+{d:"2026-11-12",m:"Pulzo",t:"Inesperado giro en caso de Zulma Guzmán con talio: nueva denuncia plantea sacudón en investigación",u:"https://www.pulzo.com/nacion/nueva-denuncia-caso-zulma-guzman-con-talio-plantea-giro-investigacion-PP5355145",me:"E",ex:"M",q:"Según la denuncia, murió en la FSFB por una sustancia tóxica sin que el caso recibiera indagación forense. No incluye versión de la FSFB.",f:"Denuncia de la familia, David Espinosa, Los Informantes",tp:"Nacional digital"},
+{d:"2026-11-12",m:"Publimetro",t:"Zulma Guzmán: nueva denuncia señala a Juan de Bedout por la muerte de su esposa y menciona presencia de talio",u:"https://www.publimetro.co/bogota/2026/11/12/caso-zulma-guzman-acusan-a-juan-de-bedout-de-estar-implicado-en-presunto-envenenamiento-de-su-esposa/",me:"N",ex:"N",q:"Radicación de la denuncia, revelada por Noticias Caracol. No menciona a la FSFB.",f:"Noticias Caracol, denuncia de la familia",tp:"Nacional digital"}
+];
+
+const MEN = {E:{l:"Explícita",c:"var(--s-alta)",txt:"#fff"},I:{l:"Indirecta",c:"var(--s-media)",txt:"#fff"},N:{l:"No menciona",c:"var(--s-ninguna)",txt:"#1F1733"}};
+const EXP = {A:{l:"Alta",c:"var(--s-alta)",txt:"#fff"},M:{l:"Media",c:"var(--s-media)",txt:"#fff"},B:{l:"Baja",c:"var(--s-baja)",txt:"#1F1733"},N:{l:"Ninguna",c:"var(--s-ninguna)",txt:"#1F1733"}};
+const MESES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const fmtDate = iso => {const [y,m,d]=iso.split("-");return `${+d} ${MESES[+m-1]}`;};
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const N = DATA.length;
+const count = (k,v)=>DATA.filter(r=>r[k]===v).length;
+
+/* tabs */
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav.tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll("section.panel").forEach(p=>p.classList.toggle("active",p.id===b.dataset.tab));
+  window.scrollTo({top:0});
+}));
+
+/* tooltip */
+const tip=document.getElementById("tip");
+function showTip(html,e){tip.innerHTML=html;tip.style.opacity=1;moveTip(e);}
+function moveTip(e){const x=(e.touches?e.touches[0].clientX:e.clientX),y=(e.touches?e.touches[0].clientY:e.clientY);
+  const w=tip.offsetWidth,h=tip.offsetHeight;let lx=x+14,ly=y-h-12;
+  if(lx+w>window.innerWidth-8)lx=x-w-14; if(ly<8)ly=y+16; tip.style.left=lx+"px";tip.style.top=ly+"px";}
+function hideTip(){tip.style.opacity=0;}
+
+/* KPIs */
+const nE=count("me","E"), nI=count("me","I"), nA=count("ex","A");
+document.getElementById("kpis").innerHTML=`
+ <div class="kpi hero"><p class="lbl">Notas que nombran a la FSFB</p><p class="val">${nE} <small>de ${N}</small></p><p class="det">${Math.round(nE/N*100)}% del total · ${nI} más la aluden sin nombrarla</p></div>
+ <div class="kpi"><p class="lbl">Notas publicadas</p><p class="val">${N}</p><p class="det">12–21 nov · todas leídas completas</p></div>
+ <div class="kpi"><p class="lbl">Exposición alta</p><p class="val">${nA}</p><p class="det">Todas desde el 18 nov</p></div>
+ <div class="kpi"><p class="lbl">Notas con versión de la FSFB</p><p class="val">2</p><p class="det">Semana y Pulzo · sin vocero</p></div>`;
+
+/* segmented bars */
+function seg(el,key,MAP,order){
+  const box=document.getElementById(el);
+  const parts=order.map(k=>({k,n:count(key,k)})).filter(p=>p.n>0);
+  box.innerHTML=`<div class="seg">${parts.map(p=>`<div data-k="${p.k}" style="flex:${p.n} 1 0;background:${MAP[p.k].c};color:${MAP[p.k].txt}" tabindex="0" aria-label="${MAP[p.k].l}: ${p.n} notas (${Math.round(p.n/N*100)}%)">${p.n/N>=.09?p.n:""}</div>`).join("")}</div>
+  <div class="legend">${parts.map(p=>`<span><i style="background:${MAP[p.k].c}"></i>${MAP[p.k].l} · ${p.n} (${Math.round(p.n/N*100)}%)</span>`).join("")}</div>`;
+  box.querySelectorAll(".seg div").forEach(d=>{
+    const p=parts.find(x=>x.k===d.dataset.k);
+    const h=`<b>${MAP[p.k].l}</b><br>${p.n} notas · ${Math.round(p.n/N*100)}%`;
+    d.addEventListener("mouseenter",e=>showTip(h,e));d.addEventListener("mousemove",moveTip);d.addEventListener("mouseleave",hideTip);
+    d.addEventListener("touchstart",e=>showTip(h,e),{passive:true});d.addEventListener("touchend",()=>setTimeout(hideTip,1500));
+  });
+}
+seg("segMencion","me",MEN,["E","I","N"]);
+seg("segExpo","ex",EXP,["A","M","B","N"]);
+
+/* daily stacked columns */
+function drawDaily(){
+  const days=[];for(let d=12;d<=21;d++)days.push(`2026-11-${d}`);
+  const order=["N","B","M","A"]; // bottom -> top
+  const byDay=days.map(day=>{const o={day,tot:0};order.forEach(k=>{o[k]=DATA.filter(r=>r.d===day&&r.ex===k).length;o.tot+=o[k];});return o;});
+  const max=Math.max(...byDay.map(d=>d.tot)); const yMax=Math.ceil(max/4)*4;
+  const box=document.getElementById("daily");
+  const W=Math.max(300,Math.round(box.clientWidth||720)),H=W<520?220:260,pl=28,pr=8,pt=18,pb=28; const iw=W-pl-pr, ih=H-pt-pb;
+  const band=iw/days.length, bw=Math.min(24,band*0.55);
+  const y=v=>pt+ih-(v/yMax)*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Notas por día según exposición para la FSFB">`;
+  for(let t=0;t<=yMax;t+=4){s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="#E6E1EA" stroke-width="1"/><text x="${pl-8}" y="${y(t)+4}" font-size="11" fill="#7A7390" text-anchor="end" style="font-variant-numeric:tabular-nums">${t}</text>`;}
+  byDay.forEach((o,i)=>{
+    const cx=pl+band*i+band/2, x=cx-bw/2; let acc=0;
+    const segs=order.filter(k=>o[k]>0);
+    segs.forEach((k,j)=>{
+      const y0=y(acc), y1=y(acc+o[k]); const top=j===segs.length-1;
+      const hgt=y0-y1-(top?0:2); const yy=y1+(top?0:0);
+      if(top){ const r=Math.min(4,hgt); s+=`<path d="M${x},${y0} V${yy+r} Q${x},${yy} ${x+r},${yy} H${x+bw-r} Q${x+bw},${yy} ${x+bw},${yy+r} V${y0} Z" fill="${EXP[k].c}"/>`; }
+      else s+=`<rect x="${x}" y="${yy+2}" width="${bw}" height="${Math.max(0,hgt)}" fill="${EXP[k].c}"/>`;
+      acc+=o[k];
+    });
+    if(o.tot>0)s+=`<text x="${cx}" y="${y(o.tot)-6}" font-size="12" font-weight="600" fill="#1F1733" text-anchor="middle">${o.tot}</text>`;
+    s+=`<text x="${cx}" y="${H-8}" font-size="11" fill="#4A4260" text-anchor="middle">${+o.day.slice(8)}</text>`;
+    s+=`<rect class="hit" data-i="${i}" x="${pl+band*i}" y="${pt}" width="${band}" height="${ih}" fill="transparent"/>`;
+  });
+  s+=`<line x1="${pl}" x2="${W-pr}" y1="${y(0)}" y2="${y(0)}" stroke="#CFC8D8" stroke-width="1"/></svg>`;
+  box.innerHTML=s;
+  box.querySelectorAll(".hit").forEach(h=>{
+    const o=byDay[+h.dataset.i];
+    const html=`<b>${fmtDate(o.day)} · ${o.tot} notas</b>`+["A","M","B","N"].map(k=>`<div class="row"><i style="background:${EXP[k].c}"></i>${EXP[k].l}: ${o[k]}</div>`).join("");
+    h.addEventListener("mouseenter",e=>showTip(html,e));h.addEventListener("mousemove",moveTip);h.addEventListener("mouseleave",hideTip);
+    h.addEventListener("touchstart",e=>showTip(html,e),{passive:true});h.addEventListener("touchend",()=>setTimeout(hideTip,1800));
+  });
+  document.getElementById("dailyLegend").innerHTML=["A","M","B","N"].map(k=>`<span><i style="background:${EXP[k].c}"></i>${EXP[k].l}</span>`).join("");
+  document.getElementById("dailyTable").innerHTML=`<table><thead><tr><th>Día</th><th>Alta</th><th>Media</th><th>Baja</th><th>Ninguna</th><th>Total</th></tr></thead><tbody>${byDay.map(o=>`<tr><td>${fmtDate(o.day)}</td><td>${o.A}</td><td>${o.M}</td><td>${o.B}</td><td>${o.N}</td><td>${o.tot}</td></tr>`).join("")}</tbody></table>`;
+}
+drawDaily();
+let rT;window.addEventListener("resize",()=>{clearTimeout(rT);rT=setTimeout(drawDaily,150);});
+document.querySelector('button[data-tab="resumen"]').addEventListener("click",()=>setTimeout(drawDaily,0));
+
+/* notes table */
+const state={ex:"",me:"",q:""};
+const fx=document.getElementById("fExpo");
+fx.innerHTML=`<button class="chip" aria-pressed="true" data-v="">Toda exposición</button>`+["A","M","B","N"].map(k=>`<button class="chip" aria-pressed="false" data-v="${k}"><i style="background:${EXP[k].c}"></i>${EXP[k].l} · ${count("ex",k)}</button>`).join("");
+fx.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{fx.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===c));state.ex=c.dataset.v;render();}));
+document.getElementById("fMencion").addEventListener("change",e=>{state.me=e.target.value;render();});
+document.getElementById("fTexto").addEventListener("input",e=>{state.q=e.target.value.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");render();});
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function pill(MAP,k){return `<span class="pill"><i style="background:${MAP[k].c}"></i>${MAP[k].l}</span>`;}
+function render(){
+  const rows=DATA.filter(r=>(!state.ex||r.ex===state.ex)&&(!state.me||r.me===state.me)&&(!state.q||norm(r.m+" "+r.t+" "+r.f+" "+r.q).includes(state.q)));
+  document.getElementById("count").textContent=`${rows.length} de ${N} notas`;
+  document.getElementById("rows").innerHTML=rows.map(r=>`<tr>
+    <td class="d">${fmtDate(r.d)}${r.ap?' <span class="aprox">aprox.</span>':''}</td>
+    <td class="m">${esc(r.m)}</td>
+    <td class="t"><a href="${r.u}" target="_blank" rel="noopener">${esc(r.t)}</a></td>
+    <td class="tags" data-mob="1">${pill(MEN,r.me)}<span class="mob-only"></span></td>
+    <td class="hide-m">${pill(EXP,r.ex)}</td>
+    <td data-l="Qué dice sobre la FSFB">${esc(r.q)}</td>
+    <td data-l="Fuentes citadas">${esc(r.f)}</td>
+    <td data-l="Tipo de medio">${esc(r.tp)}</td></tr>`).join("") || `<tr><td colspan="8" style="padding:20px">No hay notas con esos filtros.</td></tr>`;
+  // on mobile, show exposure pill next to mention pill
+  if(window.matchMedia("(max-width:700px)").matches){
+    document.querySelectorAll("#rows tr").forEach((tr,i)=>{const td=tr.querySelector("td.tags");if(td&&rows[i])td.innerHTML=`<span class="aprox">Mención</span>${pill(MEN,rows[i].me)}<span class="aprox">Exposición</span>${pill(EXP,rows[i].ex)}`;});
+  }
+}
+render();
+window.matchMedia("(max-width:700px)").addEventListener?.("change",render);
+</script>
+</body>
+</html>
